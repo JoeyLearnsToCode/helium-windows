@@ -152,7 +152,7 @@ def stage_build(build_outputs, seven_zip, arch=None):
         if not required.is_file():
             raise FileNotFoundError(required)
 
-    print(f'Signing staging directory: {work}')
+    print(f'Staging directory: {work}')
     return work
 
 
@@ -197,7 +197,7 @@ def build_packages(work, build_outputs, seven_zip):
 
 def check_equal(actual, expected, description):
     if actual != expected:
-        raise ValueError(f'{description} differs from the signed staging files')
+        raise ValueError(f'{description} differs from the staged files')
 
 
 def verify_mini_installer(mini, temp, seven_zip, expected):
@@ -234,14 +234,14 @@ def verify_portable_zip(portable, expected):
 
 
 def verify_packages(work, seven_zip, nsis, mini, portable, expected):
-    """Check that each release package contains the signed staging files."""
+    """Check that each release package contains the staged files."""
     expected = {**expected, 'archive': digest(work / 'helium.packed.7z')}
     with tempfile.TemporaryDirectory(prefix='verify-', dir=work) as temp:
         temp = Path(temp)
         verify_mini_installer(mini, temp, seven_zip, expected)
         verify_nsis_installer(nsis, temp, seven_zip, expected)
         verify_portable_zip(portable, expected)
-    print('Verified both installers and portable ZIP against the signed payloads.')
+    print('Verified both installers and portable ZIP against the staged payloads.')
 
 
 def main():

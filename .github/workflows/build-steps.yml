@@ -9,31 +9,12 @@ on:
       runs-on:
         required: true
         type: string
-    secrets:
-      AZURE_TENANT_ID:
-        required: true
-      AZURE_CLIENT_ID:
-        required: true
-      AZURE_CLIENT_SECRET:
-        required: true
-      AZURE_SIGNING_ENDPOINT:
-        required: true
-      AZURE_SIGNING_ACCOUNT:
-        required: true
-      AZURE_SIGNING_CERTIFICATE_NAME:
-        required: true
-
 permissions:
   contents: read
-
-env:
-  WINSPARKLE_ED_KEY: ${{ vars.WINSPARKLE_ED_KEY }}
-  WINSPARKLE_AUTHENTICODE_ORG: ${{ vars.WINSPARKLE_AUTHENTICODE_ORG }}
 
 jobs:
   build-1:
     uses: ./.github/workflows/build-stage.yml
-    secrets: inherit
     with:
       arch: ${{ inputs.arch }}
       runs-on: ${{ inputs.runs-on }}
@@ -43,7 +24,6 @@ jobs:
     needs: build-1
     if: needs.build-1.outputs.finished == 'false'
     uses: ./.github/workflows/build-stage.yml
-    secrets: inherit
     with:
       arch: ${{ inputs.arch }}
       runs-on: ${{ inputs.runs-on }}
@@ -53,7 +33,6 @@ jobs:
     needs: build-2
     if: needs.build-2.outputs.finished == 'false'
     uses: ./.github/workflows/build-stage.yml
-    secrets: inherit
     with:
       arch: ${{ inputs.arch }}
       runs-on: ${{ inputs.runs-on }}
@@ -63,7 +42,6 @@ jobs:
     needs: build-3
     if: needs.build-3.outputs.finished == 'false'
     uses: ./.github/workflows/build-stage.yml
-    secrets: inherit
     with:
       arch: ${{ inputs.arch }}
       runs-on: ${{ inputs.runs-on }}
@@ -73,7 +51,6 @@ jobs:
     needs: build-4
     if: needs.build-4.outputs.finished == 'false'
     uses: ./.github/workflows/build-stage.yml
-    secrets: inherit
     with:
       arch: ${{ inputs.arch }}
       runs-on: ${{ inputs.runs-on }}
@@ -83,7 +60,6 @@ jobs:
     needs: build-5
     if: needs.build-5.outputs.finished == 'false'
     uses: ./.github/workflows/build-stage.yml
-    secrets: inherit
     with:
       arch: ${{ inputs.arch }}
       runs-on: ${{ inputs.runs-on }}
@@ -93,7 +69,6 @@ jobs:
     needs: build-6
     if: needs.build-6.outputs.finished == 'false'
     uses: ./.github/workflows/build-stage.yml
-    secrets: inherit
     with:
       arch: ${{ inputs.arch }}
       runs-on: ${{ inputs.runs-on }}
@@ -103,7 +78,6 @@ jobs:
     needs: build-7
     if: needs.build-7.outputs.finished == 'false'
     uses: ./.github/workflows/build-stage.yml
-    secrets: inherit
     with:
       arch: ${{ inputs.arch }}
       runs-on: ${{ inputs.runs-on }}
@@ -113,7 +87,6 @@ jobs:
     needs: build-8
     if: needs.build-8.outputs.finished == 'false'
     uses: ./.github/workflows/build-stage.yml
-    secrets: inherit
     with:
       arch: ${{ inputs.arch }}
       runs-on: ${{ inputs.runs-on }}
@@ -123,7 +96,6 @@ jobs:
     needs: build-9
     if: needs.build-9.outputs.finished == 'false'
     uses: ./.github/workflows/build-stage.yml
-    secrets: inherit
     with:
       arch: ${{ inputs.arch }}
       runs-on: ${{ inputs.runs-on }}
@@ -133,7 +105,6 @@ jobs:
     needs: build-10
     if: needs.build-10.outputs.finished == 'false'
     uses: ./.github/workflows/build-stage.yml
-    secrets: inherit
     with:
       arch: ${{ inputs.arch }}
       runs-on: ${{ inputs.runs-on }}
@@ -143,7 +114,6 @@ jobs:
     needs: build-11
     if: needs.build-11.outputs.finished == 'false'
     uses: ./.github/workflows/build-stage.yml
-    secrets: inherit
     with:
       arch: ${{ inputs.arch }}
       runs-on: ${{ inputs.runs-on }}
@@ -153,7 +123,6 @@ jobs:
     needs: build-12
     if: needs.build-12.outputs.finished == 'false'
     uses: ./.github/workflows/build-stage.yml
-    secrets: inherit
     with:
       arch: ${{ inputs.arch }}
       runs-on: ${{ inputs.runs-on }}
@@ -163,7 +132,6 @@ jobs:
     needs: build-13
     if: needs.build-13.outputs.finished == 'false'
     uses: ./.github/workflows/build-stage.yml
-    secrets: inherit
     with:
       arch: ${{ inputs.arch }}
       runs-on: ${{ inputs.runs-on }}
@@ -173,7 +141,6 @@ jobs:
     needs: build-14
     if: needs.build-14.outputs.finished == 'false'
     uses: ./.github/workflows/build-stage.yml
-    secrets: inherit
     with:
       arch: ${{ inputs.arch }}
       runs-on: ${{ inputs.runs-on }}
@@ -192,9 +159,3 @@ jobs:
         id: package
         with:
           arch: ${{ inputs.arch }}
-          azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          azure-client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
-          azure-signing-endpoint: ${{ secrets.AZURE_SIGNING_ENDPOINT }}
-          azure-signing-account: ${{ secrets.AZURE_SIGNING_ACCOUNT }}
-          azure-signing-certificate-name: ${{ secrets.AZURE_SIGNING_CERTIFICATE_NAME }}

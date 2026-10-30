@@ -15,7 +15,7 @@ inputs:
     required: false
     default: false
   upload_final:
-    description: Upload artifacts after installer creation and signing
+    description: Upload artifacts after packaging
     required: false
     default: false
   final_directory:
