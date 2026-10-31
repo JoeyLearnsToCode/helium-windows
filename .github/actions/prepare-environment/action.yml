@@ -10,6 +10,26 @@ runs:
       uses: actions/setup-python@v5
       with:
         python-version: '3.12'
+    - name: Free disk space
+      shell: pwsh
+      run: |
+        $before = (Get-PSDrive C).Free
+        $paths = @(
+          'C:\Program Files\dotnet',
+          'C:\Program Files (x86)\Android',
+          'C:\Program Files\Microsoft\jdk-*',
+          'C:\hostedtoolcache\windows\Java_*',
+          'C:\hostedtoolcache\windows\Ruby',
+          'C:\hostedtoolcache\windows\Go',
+          'C:\hostedtoolcache\windows\PyPy',
+          'C:\ProgramData\chocolatey\lib',
+          'C:\Program Files\Google\Chrome'
+        )
+        foreach ($path in $paths) {
+          Remove-Item $path -Recurse -Force -ErrorAction SilentlyContinue
+        }
+        $after = (Get-PSDrive C).Free
+        Write-Host ("freed {0:N1} GiB, free now {1:N1} GiB" -f (($after - $before) / 1GB), ($after / 1GB))
     - name: Install Windows SDK 10.0.28000.0
       shell: pwsh
       run: |

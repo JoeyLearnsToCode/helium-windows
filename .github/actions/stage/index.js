@@ -5,6 +5,7 @@ const {DefaultArtifactClient} = require('@actions/artifact');
 const glob = require('@actions/glob');
 
 const path = require('path');
+const fs = require('fs');
 const os = require('os');
 
 async function run() {
@@ -98,24 +99,37 @@ async function run() {
     core.setOutput('package_here', package_here);
 
     if (!package_here && core.getBooleanInput('save_artifact')) {
-        await exec.exec('7z', ['a', '-tzip', 'C:\\helium-windows\\artifacts.zip',
-            'C:\\helium-windows\\build\\src', '-mx=3', '-mtc=on'], {ignoreReturnCode: true});
-        for (let i = 0; i < 5; ++i) {
+        const archivePath = 'C:\\helium-windows\\artifacts.zip';
+        try {
+            fs.unlinkSync(archivePath);
+        } catch (e) {
+            // ignored
+        }
+        const stats = fs.statfsSync('C:\\');
+        console.log(`free space before archive: ${(stats.bavail * stats.bsize / 2 ** 30).toFixed(1)} GiB`);
+        const archiveCode = await exec.exec('7z', ['a', '-tzip', archivePath,
+            'C:\\helium-windows\\build\\src', '-mx=3', '-mtc=on'], { ignoreReturnCode: true });
+        if (archiveCode !== 0 || !fs.existsSync(archivePath)) {
+            throw `Failed to create the build artifact archive (7z exit ${archiveCode})`;
+        }
+        let uploaded = false;
+        for (let i = 0; i < 5 && !uploaded; ++i) {
             try {
                 await artifact.deleteArtifact(artifactName);
             } catch (e) {
                 // ignored
             }
             try {
-                await artifact.uploadArtifact(artifactName, ['C:\\helium-windows\\artifacts.zip'],
+                await artifact.uploadArtifact(artifactName, [archivePath],
                     'C:\\helium-windows', { retentionDays: 4, compressionLevel: 0 });
-                break;
+                uploaded = true;
             } catch (e) {
                 console.error(`Upload artifact failed: ${e}`);
                 // Wait 10 seconds between the attempts
                 await new Promise(r => setTimeout(r, 10000));
             }
         }
+        if (!uploaded) throw 'Failed to upload the build artifact archive';
     }
 }
 

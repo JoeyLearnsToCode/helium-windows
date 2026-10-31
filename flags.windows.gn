@@ -1,4 +1,4 @@
-chrome_pgo_phase=2
+chrome_pgo_phase=0
 enable_swiftshader=false
 ffmpeg_branding="Chrome"
 is_clang=true
@@ -11,6 +11,6 @@ use_siso=true
 dcheck_always_on=false
 blink_symbol_level=0
 v8_symbol_level=0
-symbol_level=1
+symbol_level=0
 enable_rust=true
 enable_mse_mpeg2ts_stream_parser=true
