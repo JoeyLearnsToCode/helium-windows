@@ -73,7 +73,7 @@ async function run() {
             '--platform-tree', '.'
         ]);
 
-        if (exitCode !== 0) throw `failed getting version: ${exitCode}`;
+        if (exitCode !== 0) throw new Error(`failed getting version: ${exitCode}`);
         core.setOutput('version', stdout.trim());
         core.setOutput('finished', true);
         return;
@@ -89,7 +89,7 @@ async function run() {
     });
 
     if (retCode > 0 && retCode !== 42) {
-        throw `Unexpected return code: ${retCode}`
+        throw new Error(`Unexpected return code: ${retCode}`)
     }
 
     core.setOutput('finished', retCode === 0);
@@ -109,9 +109,15 @@ async function run() {
         console.log(`free space before archive: ${(stats.bavail * stats.bsize / 2 ** 30).toFixed(1)} GiB`);
         const archiveCode = await exec.exec('7z', ['a', '-tzip', archivePath,
             'C:\\helium-windows\\build\\src', '-mx=3', '-mtc=on'], { ignoreReturnCode: true });
-        if (archiveCode !== 0 || !fs.existsSync(archivePath)) {
-            throw `Failed to create the build artifact archive (7z exit ${archiveCode})`;
+        // 7-Zip returns 1 for non-fatal warnings (unreadable test-data symlinks),
+        // which still produces a usable archive.
+        if (!fs.existsSync(archivePath) || (archiveCode !== 0 && archiveCode !== 1)) {
+            throw new Error(`Failed to create the build artifact archive (7z exit ${archiveCode})`);
         }
+        if (archiveCode === 1) {
+            core.warning('7z reported warnings; keeping the archive');
+        }
+        console.log(`archived ${(fs.statSync(archivePath).size / 2 ** 30).toFixed(1)} GiB`);
         let uploaded = false;
         for (let i = 0; i < 5 && !uploaded; ++i) {
             try {
@@ -129,8 +135,8 @@ async function run() {
                 await new Promise(r => setTimeout(r, 10000));
             }
         }
-        if (!uploaded) throw 'Failed to upload the build artifact archive';
+        if (!uploaded) throw new Error('Failed to upload the build artifact archive');
     }
 }
 
-run().catch(err => core.setFailed(err.message));
+run().catch(err => core.setFailed(err && err.message ? err.message : String(err)));
